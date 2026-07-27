@@ -1,0 +1,9 @@
+{
+  "name": "Dilara Finance",
+  "short_name": "Finance",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fffaf7",
+  "theme_color": "#f6e1e8",
+  "icons": []
+}
