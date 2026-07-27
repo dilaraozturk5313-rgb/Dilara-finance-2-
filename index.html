@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f7e3eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Dilara Finance">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Dilara Finance</title>
+</head>
+<body>
+<div id="app" class="app">
+  <header class="hero" id="top">
+    <div>
+      <p class="brand">DILARA FINANCE</p>
+      <h1>Min budget</h1>
+      <p class="tagline">Leva på CSN · spara hela lönen</p>
+    </div>
+    <button id="settingsBtn" class="round" aria-label="Inställningar">⋯</button>
+  </header>
+
+  <main>
+    <section class="month-switcher">
+      <button id="prevMonth" class="round small" aria-label="Föregående månad">‹</button>
+      <div class="month-center">
+        <span>MÅNAD</span>
+        <h2 id="monthLabel"></h2>
+      </div>
+      <button id="nextMonth" class="round small" aria-label="Nästa månad">›</button>
+    </section>
+
+    <section class="stats-grid">
+      <article class="stat-card">
+        <span>CSN</span>
+        <strong id="csnValue">13 500 kr</strong>
+        <small>Månadsbudget</small>
+      </article>
+      <article class="stat-card">
+        <span>Spenderat</span>
+        <strong id="spentValue">0 kr</strong>
+        <small id="spentPct">0 % av CSN</small>
+      </article>
+      <article class="stat-card blush">
+        <span>Kvar på kontot</span>
+        <strong id="remainingValue">13 500 kr</strong>
+        <small>Efter registrerade köp</small>
+      </article>
+      <article class="stat-card">
+        <span>Sparat totalt</span>
+        <strong id="savedValue">0 kr</strong>
+        <small>Registrerade löner</small>
+      </article>
+    </section>
+
+    <section class="card quick-card">
+      <div class="section-head">
+        <div>
+          <span>SNABBREGISTRERA</span>
+          <h3>Nytt köp</h3>
+        </div>
+      </div>
+      <div class="quick-fields">
+        <label>
+          <span>Belopp</span>
+          <input id="quickAmount" type="number" min="0" step="1" inputmode="decimal" placeholder="0">
+        </label>
+        <label>
+          <span>Vad köpte du?</span>
+          <input id="quickDesc" type="text" placeholder="Till exempel ICA">
+        </label>
+      </div>
+      <div id="categoryChips" class="chips" aria-label="Välj kategori"></div>
+      <p id="quickHint" class="hint"></p>
+      <button id="quickSave" class="primary">Spara köp</button>
+    </section>
+
+    <section class="card" id="budgetSection">
+      <div class="section-head">
+        <div>
+          <span>BUDGET</span>
+          <h3>Dina kategorier</h3>
+        </div>
+        <button id="editBudgetBtn" class="link">Redigera</button>
+      </div>
+      <div id="budgetList" class="budget-list"></div>
+      <div class="budget-summary">
+        <span>Planerat kvar efter hela budgeten</span>
+        <strong id="plannedLeft">0 kr</strong>
+      </div>
+    </section>
+
+    <section class="card" id="purchaseSection">
+      <div class="section-head">
+        <div>
+          <span>KÖP</span>
+          <h3>Historik</h3>
+        </div>
+        <button id="exportBtn" class="link">Exportera</button>
+      </div>
+      <div id="purchaseList"></div>
+    </section>
+
+    <section class="card" id="salarySection">
+      <div class="section-head">
+        <div>
+          <span>LÖN & SPARANDE</span>
+          <h3>Spara hela lönen</h3>
+        </div>
+        <button id="addSalaryBtn" class="link">Lägg till</button>
+      </div>
+      <div class="salary-totals">
+        <div>
+          <span>Denna månad</span>
+          <strong id="monthSalary">0 kr</strong>
+        </div>
+        <div>
+          <span>Totalt</span>
+          <strong id="salaryTotal">0 kr</strong>
+        </div>
+      </div>
+      <div id="salaryList"></div>
+    </section>
+
+    <section class="focus-card">
+      <span>MITT FOKUS</span>
+      <p>♡ Leva på CSN</p>
+      <p>♡ Spara hela lönen</p>
+      <p>♡ Investera i framtiden</p>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button data-jump="#top">Översikt</button>
+    <button data-jump="#budgetSection">Budget</button>
+    <button id="fab" aria-label="Lägg till köp">＋</button>
+    <button data-jump="#purchaseSection">Köp</button>
+    <button data-jump="#salarySection">Sparande</button>
+  </nav>
+</div>
+
+<div id="backdrop" class="backdrop hidden"></div>
+
+<section id="purchaseSheet" class="sheet hidden" aria-hidden="true">
+  <div class="handle"></div>
+  <div class="sheet-head">
+    <div>
+      <span>KÖP</span>
+      <h3 id="purchaseSheetTitle">Nytt köp</h3>
+    </div>
+    <button class="round close-sheet" aria-label="Stäng">×</button>
+  </div>
+  <form id="purchaseForm">
+    <input id="purchaseId" type="hidden">
+    <label>Belopp
+      <input id="purchaseAmount" type="number" min="0" step="1" inputmode="decimal" required>
+    </label>
+    <label>Beskrivning
+      <input id="purchaseDesc" type="text" required>
+    </label>
+    <label>Kategori
+      <select id="purchaseCategory" required></select>
+    </label>
+    <label>Datum
+      <input id="purchaseDate" type="date" required>
+    </label>
+    <button class="primary" type="submit">Spara</button>
+  </form>
+</section>
+
+<section id="categorySheet" class="sheet hidden" aria-hidden="true">
+  <div class="handle"></div>
+  <div class="sheet-head">
+    <div>
+      <span>KATEGORI</span>
+      <h3 id="categoryTitle">Mat</h3>
+    </div>
+    <button class="round close-sheet" aria-label="Stäng">×</button>
+  </div>
+  <div class="category-hero">
+    <div><span>Budget</span><strong id="categoryBudget">0 kr</strong></div>
+    <div><span>Spenderat</span><strong id="categorySpent">0 kr</strong></div>
+    <div><span>Kvar</span><strong id="categoryLeft">0 kr</strong></div>
+  </div>
+  <button id="addPurchaseForCategory" class="primary">Lägg till köp i kategorin</button>
+  <div id="categoryPurchaseList" class="category-purchases"></div>
+</section>
+
+<section id="salarySheet" class="sheet hidden" aria-hidden="true">
+  <div class="handle"></div>
+  <div class="sheet-head">
+    <div>
+      <span>LÖN</span>
+      <h3 id="salarySheetTitle">Lägg till lön</h3>
+    </div>
+    <button class="round close-sheet" aria-label="Stäng">×</button>
+  </div>
+  <form id="salaryForm">
+    <input id="salaryId" type="hidden">
+    <label>Nettolön
+      <input id="salaryAmount" type="number" min="0" step="1" inputmode="decimal" required>
+    </label>
+    <label>Månad
+      <input id="salaryMonth" type="month" required>
+    </label>
+    <button class="primary" type="submit">Spara</button>
+  </form>
+</section>
+
+<section id="budgetSheet" class="sheet hidden" aria-hidden="true">
+  <div class="handle"></div>
+  <div class="sheet-head">
+    <div>
+      <span>BUDGET</span>
+      <h3>Redigera belopp</h3>
+    </div>
+    <button class="round close-sheet" aria-label="Stäng">×</button>
+  </div>
+  <form id="budgetForm">
+    <div id="budgetInputs"></div>
+    <button class="primary" type="submit">Spara budget</button>
+  </form>
+</section>
+
+<section id="settingsSheet" class="sheet hidden" aria-hidden="true">
+  <div class="handle"></div>
+  <div class="sheet-head">
+    <div>
+      <span>INSTÄLLNINGAR</span>
+      <h3>Appdata</h3>
+    </div>
+    <button class="round close-sheet" aria-label="Stäng">×</button>
+  </div>
+
+  <label>CSN per månad
+    <input id="csnInput" type="number" min="0" step="1" inputmode="decimal">
+  </label>
+  <button id="saveSettingsBtn" class="primary">Spara inställningar</button>
+
+  <button id="backupBtn" class="secondary">Ladda ner säkerhetskopia</button>
+  <label class="secondary import-label">
+    Importera säkerhetskopia
+    <input id="importFile" type="file" accept=".json">
+  </label>
+  <button id="resetBtn" class="danger">Rensa all data</button>
+</section>
+
+<div id="toast" class="toast hidden"></div>
+<script src="./app.js"></script>
+</body>
+</html>
